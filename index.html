@@ -3,18 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>X26000 - Planning, Alerte Calendrier & Suivi Trésorerie Firebase</title>
+    <title>X26000 Eloge - Planning, Alerte Calendrier & Suivi Trésorerie Firebase</title>
     
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#0284c7">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="X26000">
+    <meta name="apple-mobile-web-app-title" content="X26000 Eloge">
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-    <!-- Firebase Realtime Database SDK (Sans Storage) -->
+    <!-- Firebase SDK (Sans Storage) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getDatabase, ref, push, set, onValue, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
@@ -62,17 +62,14 @@
     <div class="max-w-7xl mx-auto mb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
             <div class="flex items-center gap-2">
-                <span class="px-3 py-1 bg-blue-600 text-white font-black rounded-lg text-lg tracking-wider">X26000</span>
-                <h1 class="text-2xl md:text-3xl font-bold text-slate-900">Cupidon Spray — Opérations 26 000 pcs / Mois</h1>
+                <span class="px-3 py-1 bg-blue-600 text-white font-black rounded-lg text-lg tracking-wider">X26000 ELOGE</span>
+                <h1 class="text-2xl md:text-3xl font-bold text-slate-900">Cupidon Spray — Opérations & Stock Pilote</h1>
             </div>
-            <p class="text-slate-500 mt-1">Démarrage le 30 Octobre 2026 • Synchronisation Cloud Firebase active</p>
+            <p class="text-slate-500 mt-1">Démarrage le 30 Octobre 2026 • Synchronisation Cloud Firebase</p>
         </div>
         <div class="flex gap-3">
             <span class="px-4 py-2 bg-blue-50 text-blue-700 rounded-lg font-semibold text-sm border border-blue-200">
-                🚀 Objectif : 26 000 flacons / mois
-            </span>
-            <span class="px-4 py-2 bg-emerald-50 text-emerald-700 rounded-lg font-semibold text-sm border border-emerald-200">
-                💰 CA Mensuel : 23 400 $
+                🚀 Objectif : Stock 10k + 26 000 pcs / mois
             </span>
         </div>
     </div>
@@ -106,7 +103,7 @@
         <div class="card p-6">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
                 <div>
-                    <h3 class="text-xl font-bold text-slate-800">📅 Planning & Alertes Échéances (26 000 pcs/mois)</h3>
+                    <h3 class="text-xl font-bold text-slate-800">📅 Planning & Alertes Échéances</h3>
                     <p class="text-xs text-slate-500">Suivi des paiements usine, expéditions, retraits fret et encaissements</p>
                 </div>
                 <div class="flex items-center gap-2">
@@ -119,7 +116,6 @@
             <div class="flex flex-wrap gap-4 mb-4 text-xs font-semibold">
                 <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-blue-600 inline-block"></span> Paiements Usine</span>
                 <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-orange-500 inline-block"></span> Fret & Retrait Colis</span>
-                <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-amber-500 inline-block"></span> Conditionnement / Remplissage</span>
                 <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-emerald-600 inline-block"></span> Encaissements Ventes</span>
             </div>
 
@@ -179,7 +175,7 @@
                     <label class="block text-xs font-semibold text-slate-600 mb-1">🖼️ Capture / Preuve de transaction</label>
                     <input type="file" id="real-proof" accept="image/*" class="w-full p-1.5 border rounded-lg text-xs bg-slate-50 text-slate-600">
                 </div>
-                <button type="submit" id="btn-submit" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg transition text-sm">
+                <button type="submit" id="btn-submit" class="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg transition text-sm">
                     Enregistrer la transaction
                 </button>
             </form>
@@ -214,7 +210,7 @@
     <!-- TABLEAU ECHEANCIER -->
     <div class="max-w-7xl mx-auto mb-8">
         <div class="card p-6">
-            <h3 class="text-xl font-bold text-slate-800 mb-4">🛠️ Échéancier Théorique des Flux Financiers & Logistiques</h3>
+            <h3 class="text-xl font-bold text-slate-800 mb-4">🛠️ Échéancier Théorique (Tri Chronologique Strict)</h3>
             <div class="overflow-x-auto">
                 <table class="w-full text-left text-sm">
                     <thead>
@@ -237,14 +233,14 @@
     <!-- GRAPH & PARAMETRES -->
     <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
         <div class="card p-6 lg:col-span-2">
-            <h3 class="text-lg font-bold text-slate-800 mb-4">📈 Courbe d'Évolution de la Trésorerie (26 000 pcs / mois)</h3>
+            <h3 class="text-lg font-bold text-slate-800 mb-4">📈 Courbe d'Évolution de la Trésorerie</h3>
             <div class="h-72">
                 <canvas id="financeChart"></canvas>
             </div>
         </div>
 
         <div class="card p-6">
-            <h3 class="text-lg font-bold text-slate-800 mb-4">⚙ Paramètres X26000</h3>
+            <h3 class="text-lg font-bold text-slate-800 mb-4">⚙ Paramètres X26000 Eloge</h3>
             <div class="space-y-4">
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 mb-1">Prix Usine Chine ($/flacon)</label>
@@ -258,16 +254,8 @@
                     <label class="block text-xs font-semibold text-slate-600 mb-1">Prix de Vente Gros ($/flacon)</label>
                     <input type="text" id="param-vente" value="0.90" class="w-full p-2 border rounded-lg text-sm bg-slate-50">
                 </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">Durée Prod Usine (Jours)</label>
-                    <input type="text" id="param-prod" value="20" class="w-full p-2 border rounded-lg text-sm bg-slate-50">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">Durée Conditionnement (Jours)</label>
-                    <input type="text" id="param-condi" value="5" class="w-full p-2 border rounded-lg text-sm bg-slate-50">
-                </div>
                 <button onclick="generateAllData()" class="w-full py-2.5 bg-accent-blue text-white font-bold rounded-lg hover:bg-blue-800 transition text-sm">
-                    Recalculer le modèle X26000
+                    Recalculer le modèle
                 </button>
             </div>
         </div>
@@ -328,39 +316,39 @@
             calendarEvents = [];
             var currentSolde = 0;
 
-            // 30 Octobre
-            currentSolde -= 560;
-            allPayments.push({
+            // Tableau temporaire brut pour stocker avant de trier chronologiquement
+            var tempRows = [];
+
+            // 30 Octobre - Solde stock 10k
+            tempRows.push({
                 date: "2026-10-30", displayDate: "30 Oct 2026", monthCode: "M0",
                 label: "Solde usine restant (Stock 10k pcs)", entity: "Usine Chine",
-                type: "OUT", amount: 560, solde: currentSolde
+                type: "OUT", amount: 560
             });
             calendarEvents.push({ date: "2026-10-30", label: "💰 Solde 560$ Usine (10k)", type: "usine" });
 
+            // 30 Octobre - Acompte 30% M1
             var acompteAmt = coutUsineLot * 0.3; 
-            currentSolde -= acompteAmt;
-            allPayments.push({
+            tempRows.push({
                 date: "2026-10-30", displayDate: "30 Oct 2026", monthCode: "M1",
                 label: "Acompte 30% Usine (26 000 pcs Nov)", entity: "Usine Chine",
-                type: "OUT", amount: acompteAmt, solde: currentSolde
+                type: "OUT", amount: acompteAmt
             });
             calendarEvents.push({ date: "2026-10-30", label: "💰 Acompte 30% Usine (26k)", type: "usine" });
 
-            // 05 Novembre
-            currentSolde -= coutFret10k;
-            allPayments.push({
+            // 05 Novembre - Fret 10k
+            tempRows.push({
                 date: "2026-11-05", displayDate: "05 Nov 2026", monthCode: "M0",
                 label: "Paiement Fret 86kg au retrait Kinshasa (Stock 10k pcs)", entity: "Kin Express / Transitaire",
-                type: "OUT", amount: coutFret10k, solde: currentSolde
+                type: "OUT", amount: coutFret10k
             });
             calendarEvents.push({ date: "2026-11-05", label: "✈️ Fret 86kg (1 634$)", type: "fret" });
 
-            // 25 Novembre
-            currentSolde += ca10k;
-            allPayments.push({
+            // 25 Novembre - Encaissement 10k
+            tempRows.push({
                 date: "2026-11-25", displayDate: "25 Nov 2026", monthCode: "M1",
                 label: "Encaissement Ventes Stock Initial (10 000 flacons)", entity: "Réseau Ventes Kin/Brazza",
-                type: "IN", amount: ca10k, solde: currentSolde
+                type: "IN", amount: ca10k
             });
             calendarEvents.push({ date: "2026-11-25", label: "💵 Encaissement Ventes 10k (9k$)", type: "vente" });
 
@@ -380,41 +368,62 @@
                     var prevYear = monthIdx === 0 ? year - 1 : year;
                     var prevDateStr = formatDateStr(prevYear, prevMonthIdx, 30);
 
-                    currentSolde -= acompteAmt;
-                    allPayments.push({
+                    tempRows.push({
                         date: prevDateStr, displayDate: "30 " + monthNames[m-1].split(' ')[0],
                         monthCode: mCode, label: "Acompte 30% Usine (26k pcs " + mLabel + ")", entity: "Usine Chine",
-                        type: "OUT", amount: acompteAmt, solde: currentSolde
+                        type: "OUT", amount: acompteAmt
                     });
                 }
 
                 var date20Str = formatDateStr(year, monthIdx, 20);
                 
-                currentSolde -= soldeAmt;
-                allPayments.push({
+                tempRows.push({
                     date: date20Str, displayDate: "20 " + mLabel.split(' ')[0],
                     monthCode: mCode, label: "Solde 70% Usine (26k pcs)", entity: "Usine Chine",
-                    type: "OUT", amount: soldeAmt, solde: currentSolde
+                    type: "OUT", amount: soldeAmt
                 });
 
-                currentSolde -= coutFret26k;
-                allPayments.push({
+                tempRows.push({
                     date: date20Str, displayDate: "20 " + mLabel.split(' ')[0],
                     monthCode: mCode, label: "Fret Aérien 26k pcs (~223.6kg)", entity: "Stone Cargo / Transitaire",
-                    type: "OUT", amount: coutFret26k, solde: currentSolde
+                    type: "OUT", amount: coutFret26k
                 });
 
                 var nextMonthIdx = monthIdx === 11 ? 0 : monthIdx + 1;
                 var nextYear = monthIdx === 11 ? year + 1 : year;
                 var date10NextStr = formatDateStr(nextYear, nextMonthIdx, 10);
 
-                currentSolde += caMensuel;
-                allPayments.push({
+                tempRows.push({
                     date: date10NextStr, displayDate: "10 " + (m<5 ? monthNames[m+1].split(' ')[0] : 'Mai'),
                     monthCode: mCode, label: "Encaissement Ventes Vague 26k flacons", entity: "Réseau Ventes Kin/Brazza",
-                    type: "IN", amount: caMensuel, solde: currentSolde
+                    type: "IN", amount: caMensuel
                 });
             }
+
+            // --- TRI CHRONOLOGIQUE STRICT PAR DATE ---
+            tempRows.sort(function(a, b) {
+                var dateA = new Date(a.date);
+                var dateB = new Date(b.date);
+                if (dateA - dateB !== 0) {
+                    return dateA - dateB;
+                }
+                // Si même date, les sorties (OUT) avant les entrées (IN)
+                return (a.type === 'OUT' ? -1 : 1) - (b.type === 'OUT' ? -1 : 1);
+            });
+
+            // Calcul du solde cumulé séquentiel après tri
+            currentSolde = 0;
+            tempRows.forEach(function(row) {
+                if (row.type === 'OUT') {
+                    currentSolde -= row.amount;
+                } else {
+                    currentSolde += row.amount;
+                }
+                allPayments.push({
+                    ...row,
+                    solde: currentSolde
+                });
+            });
 
             var kpiMargeEl = document.getElementById('kpi-marge');
             if(kpiMargeEl) {
@@ -488,11 +497,7 @@
             renderCalendar();
         }
 
-        function requestNotificationPermission() {
-            if ("Notification" in window) { Notification.requestPermission(); }
-        }
-
-        // --- FIREBASE SYNC (Direct Base64 DB Storage) ---
+        // --- FIREBASE SYNC ---
         window.initAppAfterFirebase = function() {
             var dbRef = window.FB_Refs.ref(window.db, 'transactions');
             window.FB_Refs.onValue(dbRef, function(snapshot) {
