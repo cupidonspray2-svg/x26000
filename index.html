@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>X26000 - Cupidon Spray & Suivi Firebase</title>
+    <title>X26000 - Planning, Alerte Calendrier & Suivi Trésorerie</title>
     
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#0284c7">
@@ -13,12 +13,6 @@
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-    <!-- FIREBASE SDKs (v10 Compat) -->
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
-
     <style>
         body { background-color: #f8fafc; color: #1e293b; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         .card { background: white; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); border: 1px solid #e2e8f0; }
@@ -27,7 +21,7 @@
         .calendar-day-cell { min-height: 85px; border: 1px solid #e2e8f0; padding: 4px; border-radius: 6px; position: relative; background-color: #ffffff; }
         .calendar-day-cell.today { border: 2px solid #0284c7; background-color: #f0f9ff; }
         .calendar-day-number { font-size: 0.75rem; font-weight: 700; color: #334155; margin-bottom: 2px; }
-        .event-badge { font-size: 0.65rem; padding: 2px 4px; border-radius: 4px; margin-bottom: 2px; line-height: 1.1; font-weight: 600; display: block; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; cursor: pointer; }
+        .event-badge { font-size: 0.65rem; padding: 2px 4px; border-radius: 4px; margin-bottom: 2px; line-height: 1.1; font-weight: 600; display: block; text-overflow: ellipsis; overflow: hidden; whitespace: nowrap; cursor: pointer; }
         .event-usine { background-color: #dbeafe; color: #1e40af; border-left: 3px solid #2563eb; }
         .event-fret { background-color: #ffedd5; color: #9a3412; border-left: 3px solid #ea580c; }
         .event-condi { background-color: #fef3c7; color: #92400e; border-left: 3px solid #d97706; }
@@ -41,14 +35,11 @@
         <div>
             <div class="flex items-center gap-2">
                 <span class="px-3 py-1 bg-blue-600 text-white font-black rounded-lg text-lg tracking-wider">X26000</span>
-                <h1 class="text-2xl md:text-3xl font-bold text-slate-900">Cupidon Spray — Operations 26 000 pcs / Mois</h1>
+                <h1 class="text-2xl md:text-3xl font-bold text-slate-900">Cupidon Spray — Opérations 26 000 pcs / Mois</h1>
             </div>
-            <p class="text-slate-500 mt-1">Démarrage le 30 Octobre 2026 • Synchronisation Firebase Realtime active</p>
+            <p class="text-slate-500 mt-1">Démarrage le 30 Octobre 2026 • Fret calculé sur base réelle (86kg pour 10k pcs à 19$/kg)</p>
         </div>
-        <div class="flex flex-wrap gap-3 items-center">
-            <span id="firebase-status" class="px-3 py-1.5 bg-amber-50 text-amber-700 rounded-lg font-bold text-xs border border-amber-200 flex items-center gap-1.5">
-                <span class="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse"></span> Connexion Firebase...
-            </span>
+        <div class="flex gap-3">
             <span class="px-4 py-2 bg-blue-50 text-blue-700 rounded-lg font-semibold text-sm border border-blue-200">
                 🚀 Objectif : 26 000 flacons / mois
             </span>
@@ -65,7 +56,7 @@
                 <span class="text-2xl">🔔</span>
                 <div>
                     <h4 class="font-bold text-amber-900 text-sm" id="alert-title">30 Octobre 2026 : Lancement du Modèle X26000</h4>
-                    <p class="text-xs text-amber-800 mt-0.5" id="alert-desc">Paiements usine (560$ + Acompte 30%) & Fret au retrait Kinshasa. Les transactions enregistrées ci-dessous sont enregistrées en temps réel sur Firebase Cloud.</p>
+                    <p class="text-xs text-amber-800 mt-0.5" id="alert-desc">Fret 10k pcs (86 kg) = 1 634 $ payable au retrait Kinshasa le 5 Novembre.</p>
                 </div>
             </div>
             <button onclick="requestNotificationPermission()" class="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-lg text-xs transition shadow-sm whitespace-nowrap">
@@ -93,18 +84,18 @@
         </div>
         <div class="card p-5">
             <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Trésorerie Nette Finale (M6)</p>
-            <h2 class="text-2xl font-black text-emerald-600 mt-1" id="kpi-marge">123 565 $</h2>
-            <p class="text-xs text-slate-500 mt-1">Fonds accumulés après toutes déductions</p>
+            <h2 class="text-2xl font-black text-emerald-600 mt-1" id="kpi-marge">0 $</h2>
+            <p class="text-xs text-slate-500 mt-1">Fonds accumulés après déductions réelles</p>
         </div>
     </div>
 
-    <!-- CALENDRIER VISUEL D'ALERTES -->
+    <!-- CALENDRIER -->
     <div class="max-w-7xl mx-auto mb-8">
         <div class="card p-6">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
                 <div>
                     <h3 class="text-xl font-bold text-slate-800">📅 Planning & Alertes Échéances (26 000 pcs/mois)</h3>
-                    <p class="text-xs text-slate-500">Suivi des paiements usine, expéditions groupage, retraits fret, conditionnement et encaissements</p>
+                    <p class="text-xs text-slate-500">Suivi des paiements usine, expéditions, retraits fret et encaissements</p>
                 </div>
                 <div class="flex items-center gap-2">
                     <button onclick="changeCalendarMonth(-1)" class="px-3 py-1.5 border rounded-lg text-xs font-bold text-slate-600 hover:bg-slate-50">◄ Mois Précédent</button>
@@ -134,14 +125,13 @@
         </div>
     </div>
 
-    <!-- MODULE DE SAISIE ET SYNCHRONISATION FIREBASE -->
+    <!-- SAISIE TRANSACTIONS RÉELLES -->
     <div class="max-w-7xl mx-auto mb-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
-        
         <div class="card p-6 border-l-4 border-l-blue-600">
             <h3 class="text-lg font-bold text-slate-800 mb-2">➕ Enregistrer une Transaction Réelle</h3>
-            <p class="text-xs text-slate-500 mb-4">Stockée instantanément sur Firebase Cloud</p>
+            <p class="text-xs text-slate-500 mb-4">Saisis chaque règlement et insère la preuve</p>
             
-            <form id="form-real-payment" onsubmit="addRealPaymentToFirebase(event)" class="space-y-3">
+            <form id="form-real-payment" onsubmit="addRealPayment(event)" class="space-y-3">
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 mb-1">Date d'Exécution</label>
                     <input type="date" id="real-date" value="2026-10-30" required class="w-full p-2 border rounded-lg text-sm bg-slate-50">
@@ -149,16 +139,16 @@
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 mb-1">Catégorie / Cible</label>
                     <select id="real-category" required class="w-full p-2 border rounded-lg text-sm bg-slate-50">
-                        <option value="Usine Chine">Usine Chine (Solde 560$ / Solde 70% / Acompte)</option>
-                        <option value="Stone Cargo / Kin Express">Fret Aérien (Stone Cargo / Kin Express)</option>
+                        <option value="Usine Chine">Usine Chine</option>
+                        <option value="Stone Cargo / Kin Express">Fret Aérien (Kin Express / Stone Cargo)</option>
                         <option value="Agents & Commission">Agents & Réseau Vente</option>
-                        <option value="Packaging & Intrants">Conditionnement & Intrants (Local)</option>
+                        <option value="Packaging & Intrants">Conditionnement & Intrants</option>
                         <option value="Encaissement Ventes">Encaissement Ventes (Entrée)</option>
                     </select>
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 mb-1">Description / Motif</label>
-                    <input type="text" id="real-label" placeholder="ex: Solde usine 560$ + reçu Mobile Money" required class="w-full p-2 border rounded-lg text-sm bg-slate-50">
+                    <input type="text" id="real-label" placeholder="ex: Paiement fret 86kg (1634$)" required class="w-full p-2 border rounded-lg text-sm bg-slate-50">
                 </div>
                 <div class="grid grid-cols-2 gap-2">
                     <div>
@@ -170,35 +160,27 @@
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 mb-1">Montant ($)</label>
-                        <input type="number" step="0.01" id="real-amount" placeholder="560" required class="w-full p-2 border rounded-lg text-sm bg-slate-50">
+                        <input type="number" step="0.01" id="real-amount" placeholder="1634" required class="w-full p-2 border rounded-lg text-sm bg-slate-50">
                     </div>
                 </div>
-
-                <!-- PREUVE IMAGE -->
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 mb-1">🖼️ Capture / Preuve de transaction</label>
-                    <input type="file" id="real-proof" accept="image/*" class="w-full p-1.5 border rounded-lg text-xs bg-slate-50 text-slate-600 file:mr-2 file:py-1 file:px-2 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200">
-                    <p class="text-[10px] text-slate-400 mt-1">Formats : JPG, PNG, Screenshots Mobile Money/Banque</p>
+                    <input type="file" id="real-proof" accept="image/*" class="w-full p-1.5 border rounded-lg text-xs bg-slate-50 text-slate-600">
                 </div>
-
-                <button id="btn-submit-tx" type="submit" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg transition text-sm flex items-center justify-center gap-2">
-                    <span>Enregistrer sur Firebase</span>
+                <button type="submit" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg transition text-sm">
+                    Enregistrer la transaction
                 </button>
             </form>
         </div>
 
-        <!-- JOURNAL DE SUIVI AVEC PREUVES ET SYNCHRONISATION CLOUD -->
         <div class="card p-6 lg:col-span-2">
             <div class="flex justify-between items-center mb-4">
                 <div>
-                    <h3 class="text-lg font-bold text-slate-800">📊 Historique Temps Réel Firebase</h3>
-                    <p class="text-xs text-slate-500">Mise à jour automatique sur tous les téléphones/ordinateurs</p>
+                    <h3 class="text-lg font-bold text-slate-800">📊 Historique des Paiements Effectués</h3>
+                    <p class="text-xs text-slate-500">Journal des transactions réelles</p>
                 </div>
-                <span id="sync-badge" class="px-3 py-1 text-xs font-bold rounded-full bg-blue-100 text-blue-800">
-                    🔄 Sync Firebase Active
-                </span>
+                <span class="px-3 py-1 text-xs font-bold rounded-full bg-emerald-100 text-emerald-800">Système actif</span>
             </div>
-
             <div class="overflow-x-auto max-h-96 overflow-y-auto">
                 <table class="w-full text-left text-sm">
                     <thead>
@@ -211,15 +193,13 @@
                             <th class="p-2 text-center">Actions</th>
                         </tr>
                     </thead>
-                    <tbody id="real-tbody" class="divide-y divide-slate-100">
-                        <tr><td colspan="6" class="p-4 text-center text-xs text-slate-400">Chargement des données Cloud Firebase...</td></tr>
-                    </tbody>
+                    <tbody id="real-tbody" class="divide-y divide-slate-100"></tbody>
                 </table>
             </div>
         </div>
     </div>
 
-    <!-- TABLEAU ECHEANCIER THEORIQUE DETAIL -->
+    <!-- TABLEAU ECHEANCIER -->
     <div class="max-w-7xl mx-auto mb-8">
         <div class="card p-6">
             <h3 class="text-xl font-bold text-slate-800 mb-4">🛠️ Échéancier Théorique des Flux Financiers & Logistiques</h3>
@@ -242,108 +222,32 @@
         </div>
     </div>
 
-    <!-- MODALE INTERACTIVE POUR VOIR LE DÉTAIL & LA PREUVE EN GRAND -->
+    <!-- MODALE -->
     <div id="proof-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
         <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl relative border border-slate-100">
             <button onclick="closeProofModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 text-xl font-bold">✕</button>
-            
             <h3 class="text-lg font-bold text-slate-800 mb-1" id="modal-label">Détails de la transaction</h3>
             <p class="text-xs text-slate-500 mb-4" id="modal-meta"></p>
-
             <div class="border rounded-xl p-2 bg-slate-50 mb-4 flex items-center justify-center min-h-[220px]">
-                <img id="modal-img" src="" alt="Preuve de paiement" class="max-h-80 object-contain rounded-lg hidden">
-                <p id="modal-no-img" class="text-xs text-slate-400 italic">Aucune capture d'écran jointe pour cette transaction.</p>
+                <img id="modal-img" src="" alt="Preuve" class="max-h-80 object-contain rounded-lg hidden">
+                <p id="modal-no-img" class="text-xs text-slate-400 italic">Aucune capture d'écran jointe.</p>
             </div>
-
-            <div class="flex justify-between items-center text-xs text-slate-600 bg-slate-100 p-3 rounded-xl mb-4">
-                <span>Catégorie : <strong id="modal-cat" class="text-slate-800"></strong></span>
-                <span>Montant : <strong id="modal-amt" class="text-emerald-700 text-sm font-bold"></strong></span>
-            </div>
-
-            <button onclick="closeProofModal()" class="w-full py-2.5 bg-slate-800 hover:bg-slate-900 text-white font-bold rounded-xl text-xs transition">
-                Fermer l'aperçu
-            </button>
+            <button onclick="closeProofModal()" class="w-full py-2.5 bg-slate-800 hover:bg-slate-900 text-white font-bold rounded-xl text-xs transition">Fermer</button>
         </div>
     </div>
 
-    <!-- GRAPH & PARAMETRES -->
-    <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
-        <div class="card p-6 lg:col-span-2">
-            <h3 class="text-lg font-bold text-slate-800 mb-4">📈 Courbe d'Évolution de la Trésorerie (26 000 pcs / mois)</h3>
-            <div class="h-72">
-                <canvas id="financeChart"></canvas>
-            </div>
-        </div>
-
-        <div class="card p-6">
-            <h3 class="text-lg font-bold text-slate-800 mb-4">⚙ Paramètres X26000</h3>
-            <div class="space-y-4">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">Prix Usine Chine ($/flacon)</label>
-                    <input type="text" id="param-usine" value="0.096" class="w-full p-2 border rounded-lg text-sm bg-slate-50">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">Tarif Fret Aérien ($/kg)</label>
-                    <input type="text" id="param-fret" value="19" class="w-full p-2 border rounded-lg text-sm bg-slate-50">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">Prix de Vente Gros ($/flacon)</label>
-                    <input type="text" id="param-vente" value="0.90" class="w-full p-2 border rounded-lg text-sm bg-slate-50">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">Durée Prod Usine (Jours)</label>
-                    <input type="text" id="param-prod" value="20" class="w-full p-2 border rounded-lg text-sm bg-slate-50">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">Durée Conditionnement (Jours)</label>
-                    <input type="text" id="param-condi" value="5" class="w-full p-2 border rounded-lg text-sm bg-slate-50">
-                </div>
-                <button onclick="generateAllData()" class="w-full py-2.5 bg-accent-blue text-white font-bold rounded-lg hover:bg-blue-800 transition text-sm">
-                    Recalculer le modèle X26000
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- SCRIPT JAVASCRIPT AVEC FIREBASE INTEGRATION -->
     <script>
-        // CONFIGURATION EXACTE FIREBASE FOURNIE
-        const firebaseConfig = {
-            apiKey: "AIzaSyA2E5Ygxv_8hMm4C6HbTtpyprGUzi1xDPY",
-            authDomain: "x26000.firebaseapp.com",
-            databaseURL: "https://x26000-default-rtdb.firebaseio.com",
-            projectId: "x26000",
-            storageBucket: "x26000.firebasestorage.app",
-            messagingSenderId: "789227184987",
-            appId: "1:789227184987:web:3b35f60f3d05b17c44707e",
-            measurementId: "G-GNRMLPDL3V"
-        };
-
-        // INITIALISATION FIREBASE
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
-        const dbRef = db.ref('transactions');
-
-        // GESTION STATUT FIREBASE
-        const statusEl = document.getElementById('firebase-status');
-        db.ref('.info/connected').on('value', (snap) => {
-            if (snap.val() === true) {
-                statusEl.className = "px-3 py-1.5 bg-emerald-50 text-emerald-700 rounded-lg font-bold text-xs border border-emerald-200 flex items-center gap-1.5";
-                statusEl.innerHTML = '<span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span> Firebase Connecté';
-            } else {
-                statusEl.className = "px-3 py-1.5 bg-rose-50 text-rose-700 rounded-lg font-bold text-xs border border-rose-200 flex items-center gap-1.5";
-                statusEl.innerHTML = '<span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span> Hors ligne';
-            }
-        });
-
         var myChart = null;
         var allPayments = [];
         var calendarEvents = [];
-        var firebasePaymentsList = [];
+        var realPayments = [];
 
+        try {
+            realPayments = JSON.parse(localStorage.getItem('cupidon_real_payments')) || [];
+        } catch(e) { realPayments = []; }
+        
         var currentCalYear = 2026;
-        var currentCalMonth = 9; // 9 = Octobre
-
+        var currentCalMonth = 9;
         var monthNames = ["Novembre 2026", "Décembre 2026", "Janvier 2027", "Février 2027", "Mars 2027", "Avril 2027"];
 
         function cleanNum(val) {
@@ -358,16 +262,18 @@
             return y + '-' + mm + '-' + dd;
         }
 
-        // GENERATION DES DONNEES THEORIQUES ET CALCULS
         function generateAllData() {
-            var pxUsine = cleanNum(document.getElementById('param-usine') ? document.getElementById('param-usine').value : 0.096) || 0.096;
-            var pxFret = cleanNum(document.getElementById('param-fret') ? document.getElementById('param-fret').value : 19) || 19;
-            var pxVente = cleanNum(document.getElementById('param-vente') ? document.getElementById('param-vente').value : 0.90) || 0.90;
+            var pxUsine = cleanNum(document.getElementById('param-usine').value) || 0.096;
+            var pxFret = cleanNum(document.getElementById('param-fret').value) || 19;
+            var pxVente = cleanNum(document.getElementById('param-vente').value) || 0.90;
 
             var volMensuel = 26000;
             var coutUsineLot = volMensuel * pxUsine; // 2 496 $
-            var coutFretLot = 109 * pxFret; // ~2 071 $ pour 26k flacons
-            var coutFret10k = 42 * pxFret;  // ~798 $ pour 10k flacons initial
+            
+            // Calcul exact du fret basé sur 86 kg pour 10k pcs et proportionnel pour 26k pcs (~223.6 kg)
+            var coutFret10k = 86 * pxFret;        // 86 kg * 19$ = 1 634 $
+            var coutFret26k = (86 * 2.6) * pxFret; // ~223.6 kg * 19$ = 4 248,40 $
+
             var caMensuel = volMensuel * pxVente; // 23 400 $
             var ca10k = 10000 * pxVente;          // 9 000 $
 
@@ -375,7 +281,7 @@
             calendarEvents = [];
             var currentSolde = 0;
 
-            // 1. PAIEMENTS & LOGISTIQUE STOCK INITIAL (30 OCTOBRE 2026)
+            // 30 Octobre : Solde usine 10k pcs + Acompte 30% lot 26k
             currentSolde -= 560;
             allPayments.push({
                 date: "2026-10-30", displayDate: "30 Oct 2026", monthCode: "M0",
@@ -383,7 +289,6 @@
                 type: "OUT", amount: 560, solde: currentSolde
             });
             calendarEvents.push({ date: "2026-10-30", label: "💰 Solde 560$ Usine (10k)", type: "usine" });
-            calendarEvents.push({ date: "2026-10-31", label: "📦 Envoi Groupage Transitaire", type: "fret" });
 
             var acompteAmt = coutUsineLot * 0.3; // 748,80 $
             currentSolde -= acompteAmt;
@@ -394,29 +299,23 @@
             });
             calendarEvents.push({ date: "2026-10-30", label: "💰 Acompte 30% Usine (26k)", type: "usine" });
 
-            // Retrait Kinshasa Stock 10k (05 Novembre)
+            // 05 Novembre : Retrait & Fret 86kg (1 634 $)
             currentSolde -= coutFret10k;
             allPayments.push({
                 date: "2026-11-05", displayDate: "05 Nov 2026", monthCode: "M0",
-                label: "Paiement Fret au retrait Kinshasa (Stock 10k pcs)", entity: "Kin Express / Transitaire",
+                label: "Paiement Fret 86kg au retrait Kinshasa (Stock 10k pcs)", entity: "Kin Express / Transitaire",
                 type: "OUT", amount: coutFret10k, solde: currentSolde
             });
-            calendarEvents.push({ date: "2026-11-05", label: "✈️ Retrait & Paiement Fret (10k)", type: "fret" });
+            calendarEvents.push({ date: "2026-11-05", label: "✈️ Fret 86kg (1 634$)", type: "fret" });
 
-            // Session Conditionnement Stock 10k (05 au 10 Novembre)
-            for(var cd=5; cd<=10; cd++) {
-                var dStrCondi = formatDateStr(2026, 10, cd);
-                calendarEvents.push({ date: dStrCondi, label: "🧪 Conditionnement Stock 10k", type: "condi" });
-            }
-
-            // ENCAISSEMENT VENTES STOCK INITIAL (25 NOVEMBRE 2026)
+            // 25 Novembre : Encaissement Ventes Stock Initial (9 000 $)
             currentSolde += ca10k;
             allPayments.push({
                 date: "2026-11-25", displayDate: "25 Nov 2026", monthCode: "M1",
                 label: "Encaissement Ventes Stock Initial (10 000 flacons)", entity: "Réseau Ventes Kin/Brazza",
                 type: "IN", amount: ca10k, solde: currentSolde
             });
-            calendarEvents.push({ date: "2026-11-25", label: "💵 Encaissement Total Ventes 10k (9 000$)", type: "vente" });
+            calendarEvents.push({ date: "2026-11-25", label: "💵 Encaissement Ventes 10k (9k$)", type: "vente" });
 
             var years = [2026, 2026, 2027, 2027, 2027, 2027];
             var monthIndexes = [10, 11, 0, 1, 2, 3]; 
@@ -440,36 +339,25 @@
                         monthCode: mCode, label: "Acompte 30% Usine (26k pcs " + mLabel + ")", entity: "Usine Chine",
                         type: "OUT", amount: acompteAmt, solde: currentSolde
                     });
-                    calendarEvents.push({ date: prevDateStr, label: "💰 Acompte 30% Usine (" + mLabel.split(' ')[0] + ")", type: "usine" });
                 }
 
                 var date20Str = formatDateStr(year, monthIdx, 20);
                 
-                // Ligne 1 : Solde 70% Usine
+                // Solde 70% Usine
                 currentSolde -= soldeAmt;
                 allPayments.push({
                     date: date20Str, displayDate: "20 " + mLabel.split(' ')[0],
                     monthCode: mCode, label: "Solde 70% Usine (26k pcs)", entity: "Usine Chine",
                     type: "OUT", amount: soldeAmt, solde: currentSolde
                 });
-                calendarEvents.push({ date: date20Str, label: "🏭 Solde 70% Usine", type: "usine" });
 
-                // Ligne 2 : Fret Aérien (26k pcs)
-                currentSolde -= coutFretLot;
+                // Fret Aérien 26k pcs (~223.6 kg = 4 248,40 $)
+                currentSolde -= coutFret26k;
                 allPayments.push({
                     date: date20Str, displayDate: "20 " + mLabel.split(' ')[0],
-                    monthCode: mCode, label: "Fret Aérien (26k pcs)", entity: "Stone Cargo / Transitaire",
-                    type: "OUT", amount: coutFretLot, solde: currentSolde
+                    monthCode: mCode, label: "Fret Aérien 26k pcs (~223.6kg)", entity: "Stone Cargo / Transitaire",
+                    type: "OUT", amount: coutFret26k, solde: currentSolde
                 });
-                calendarEvents.push({ date: date20Str, label: "✈️ Fret Aérien (26k pcs)", type: "fret" });
-
-                var date25Str = formatDateStr(year, monthIdx, 25);
-                calendarEvents.push({ date: date25Str, label: "📦 Arrivée Kinshasa", type: "fret" });
-
-                for(var d=25; d<=29; d++) {
-                    var dateCondiStr = formatDateStr(year, monthIdx, d);
-                    calendarEvents.push({ date: dateCondiStr, label: "🧪 Remplissage 26k", type: "condi" });
-                }
 
                 var nextMonthIdx = monthIdx === 11 ? 0 : monthIdx + 1;
                 var nextYear = monthIdx === 11 ? year + 1 : year;
@@ -481,7 +369,6 @@
                     monthCode: mCode, label: "Encaissement Ventes Vague 26k flacons", entity: "Réseau Ventes Kin/Brazza",
                     type: "IN", amount: caMensuel, solde: currentSolde
                 });
-                calendarEvents.push({ date: date10NextStr, label: "💵 Encaissement Ventes 26k (23.4k$)", type: "vente" });
             }
 
             var kpiMargeEl = document.getElementById('kpi-marge');
@@ -494,7 +381,6 @@
             renderChart();
         }
 
-        // RENDU TABLEAU THEORIQUE
         function renderPaymentsTable() {
             var tbody = document.getElementById('payments-tbody');
             if(!tbody) return;
@@ -515,22 +401,18 @@
             });
         }
 
-        // RENDU CALENDRIER
         function renderCalendar() {
             var grid = document.getElementById('calendar-grid');
             if(!grid) return;
             grid.innerHTML = '';
-
             var calDate = new Date(currentCalYear, currentCalMonth, 1);
             var calMonthTitle = document.getElementById('cal-month-title');
-            if(calMonthTitle) {
-                calMonthTitle.innerText = calDate.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
-            }
+            if(calMonthTitle) calMonthTitle.innerText = calDate.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
 
             var firstDay = calDate.getDay();
             var daysInMonth = new Date(currentCalYear, currentCalMonth + 1, 0).getDate();
-
             var paddingDays = firstDay === 0 ? 6 : firstDay - 1;
+
             for (var i = 0; i < paddingDays; i++) {
                 var emptyCell = document.createElement('div');
                 emptyCell.className = "calendar-day-cell bg-slate-50 opacity-40";
@@ -542,17 +424,13 @@
 
             for (var day = 1; day <= daysInMonth; day++) {
                 var dateStr = formatDateStr(currentCalYear, currentCalMonth, day);
-
                 var cell = document.createElement('div');
                 cell.className = "calendar-day-cell " + (dateStr === todayStr ? 'today' : '');
-                
                 var dayHTML = '<div class="calendar-day-number">' + day + '</div>';
-
                 var dayEvents = calendarEvents.filter(function(e) { return e.date === dateStr; });
                 dayEvents.forEach(function(e) {
                     dayHTML += '<div class="event-badge event-' + e.type + '" title="' + e.label + '">' + e.label + '</div>';
                 });
-
                 cell.innerHTML = dayHTML;
                 grid.appendChild(cell);
             }
@@ -567,22 +445,12 @@
 
         function requestNotificationPermission() {
             if ("Notification" in window) {
-                Notification.requestPermission().then(function(permission) {
-                    if (permission === "granted") {
-                        new Notification("X26000 Cupidon Spray", { body: "Les alertes push sont activées pour ton planning !" });
-                    }
-                });
+                Notification.requestPermission();
             }
         }
 
-        // --- ENREGISTREMENT DANS FIREBASE CLOUD ---
-        function addRealPaymentToFirebase(e) {
+        function addRealPayment(e) {
             e.preventDefault();
-            
-            var btn = document.getElementById('btn-submit-tx');
-            btn.disabled = true;
-            btn.innerHTML = '<span>Envoi en cours...</span>';
-
             var dateVal = document.getElementById('real-date').value;
             var catVal = document.getElementById('real-category').value;
             var labelVal = document.getElementById('real-label').value;
@@ -590,84 +458,44 @@
             var amtVal = parseFloat(document.getElementById('real-amount').value);
             var fileInput = document.getElementById('real-proof');
 
-            function sendToDB(proofData) {
-                var newTx = {
-                    date: dateVal,
-                    category: catVal,
-                    label: labelVal,
-                    type: typeVal,
-                    amount: amtVal,
-                    proof: proofData || null,
-                    timestamp: firebase.database.ServerValue.TIMESTAMP
+            function saveAndRender(proofBase64) {
+                var newPayment = {
+                    id: Date.now(), date: dateVal, category: catVal, label: labelVal,
+                    type: typeVal, amount: amtVal, proof: proofBase64 || null
                 };
-
-                dbRef.push(newTx).then(() => {
-                    document.getElementById('form-real-payment').reset();
-                    btn.disabled = false;
-                    btn.innerHTML = '<span>Enregistrer sur Firebase</span>';
-                }).catch((err) => {
-                    alert('Erreur lors de la sauvegarde Firebase : ' + err.message);
-                    btn.disabled = false;
-                    btn.innerHTML = '<span>Enregistrer sur Firebase</span>';
-                });
+                realPayments.push(newPayment);
+                try { localStorage.setItem('cupidon_real_payments', JSON.stringify(realPayments)); } catch(err) {}
+                document.getElementById('form-real-payment').reset();
+                renderRealPayments();
             }
 
             if (fileInput.files && fileInput.files[0]) {
                 var reader = new FileReader();
-                reader.onload = function(evt) {
-                    sendToDB(evt.target.result);
-                };
+                reader.onload = function(evt) { saveAndRender(evt.target.result); };
                 reader.readAsDataURL(fileInput.files[0]);
             } else {
-                sendToDB(null);
+                saveAndRender(null);
             }
         }
 
-        // ÉCOUTEUR TEMPS RÉEL (REALTIME DATABASE ONVALUE)
-        dbRef.on('value', (snapshot) => {
-            firebasePaymentsList = [];
-            const data = snapshot.val();
-
-            if (data) {
-                Object.keys(data).forEach((key) => {
-                    firebasePaymentsList.push({
-                        key: key,
-                        ...data[key]
-                    });
-                });
-            }
-
-            renderRealPaymentsTable();
-        });
-
-        function deleteFirebasePayment(key) {
-            if(confirm("Confirmer la suppression de cette transaction sur Firebase Cloud ?")) {
-                dbRef.child(key).remove();
-            }
+        function deleteRealPayment(id) {
+            realPayments = realPayments.filter(function(p) { return p.id !== id; });
+            try { localStorage.setItem('cupidon_real_payments', JSON.stringify(realPayments)); } catch(e) {}
+            renderRealPayments();
         }
 
-        function openProofModal(key) {
-            var item = firebasePaymentsList.find(function(p) { return p.key === key; });
+        function openProofModal(id) {
+            var item = realPayments.find(function(p) { return p.id === id; });
             if (!item) return;
-
             document.getElementById('modal-label').innerText = item.label;
-            document.getElementById('modal-meta').innerText = 'Exécuté le ' + item.date + ' • Ref Cloud: ' + item.key;
-            document.getElementById('modal-cat').innerText = item.category;
-            document.getElementById('modal-amt').innerText = (item.type === 'OUT' ? '- ' : '+ ') + item.amount.toLocaleString('fr-FR') + ' $';
-
+            document.getElementById('modal-meta').innerText = 'Exécuté le ' + item.date;
             var imgEl = document.getElementById('modal-img');
             var noImgEl = document.getElementById('modal-no-img');
-
             if (item.proof) {
-                imgEl.src = item.proof;
-                imgEl.classList.remove('hidden');
-                noImgEl.classList.add('hidden');
+                imgEl.src = item.proof; imgEl.classList.remove('hidden'); noImgEl.classList.add('hidden');
             } else {
-                imgEl.src = '';
-                imgEl.classList.add('hidden');
-                noImgEl.classList.remove('hidden');
+                imgEl.src = ''; imgEl.classList.add('hidden'); noImgEl.classList.remove('hidden');
             }
-
             document.getElementById('proof-modal').classList.remove('hidden');
         }
 
@@ -675,21 +503,17 @@
             document.getElementById('proof-modal').classList.add('hidden');
         }
 
-        function renderRealPaymentsTable() {
+        function renderRealPayments() {
             var tbody = document.getElementById('real-tbody');
             if (!tbody) return;
             tbody.innerHTML = '';
-
-            firebasePaymentsList.sort(function(a,b) { return new Date(b.date) - new Date(a.date); });
-
-            firebasePaymentsList.forEach(function(p) {
+            realPayments.sort(function(a,b) { return new Date(b.date) - new Date(a.date); });
+            realPayments.forEach(function(p) {
                 var tr = document.createElement('tr');
                 tr.className = p.type === 'IN' ? 'bg-emerald-50/40' : 'hover:bg-slate-50';
-
                 var proofHTML = p.proof 
-                    ? '<img src="' + p.proof + '" onclick="openProofModal(\'' + p.key + '\')" class="w-8 h-8 object-cover rounded border cursor-pointer hover:scale-105 transition mx-auto" title="Voir la preuve en grand">'
+                    ? '<img src="' + p.proof + '" onclick="openProofModal(' + p.id + ')" class="w-8 h-8 object-cover rounded border cursor-pointer hover:scale-105 transition mx-auto">'
                     : '<span class="text-[10px] text-slate-300 italic">Aucune</span>';
-
                 tr.innerHTML = 
                     '<td class="p-2 text-xs font-semibold text-slate-600">' + p.date + '</td>' +
                     '<td class="p-2 text-xs font-medium text-slate-800">' + p.label + '</td>' +
@@ -699,29 +523,25 @@
                     '</td>' +
                     '<td class="p-2 text-xs text-center">' + proofHTML + '</td>' +
                     '<td class="p-2 text-xs text-center flex items-center justify-center gap-2">' +
-                        '<button onclick="openProofModal(\'' + p.key + '\')" class="text-blue-600 hover:text-blue-800 font-bold" title="Voir détails">👁️</button>' +
-                        '<button onclick="deleteFirebasePayment(\'' + p.key + '\')" class="text-rose-500 hover:text-rose-700 font-bold" title="Supprimer de Firebase">✕</button>' +
+                        '<button onclick="openProofModal(' + p.id + ')" class="text-blue-600 hover:text-blue-800 font-bold">👁️</button>' +
+                        '<button onclick="deleteRealPayment(' + p.id + ')" class="text-rose-500 hover:text-rose-700 font-bold">✕</button>' +
                     '</td>';
                 tbody.appendChild(tr);
             });
-
-            if (firebasePaymentsList.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-xs text-slate-400">Aucune transaction enregistrée dans Firebase Realtime Database.</td></tr>';
+            if (realPayments.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-xs text-slate-400">Aucune transaction enregistrée.</td></tr>';
             }
         }
 
         function renderChart() {
             var ctx = document.getElementById('financeChart');
             if(!ctx || typeof Chart === 'undefined') return;
-            
             var monthlySoldes = [];
             for (var m = 1; m <= 6; m++) {
                 var lastPayment = allPayments.filter(function(p) { return p.monthCode === 'M' + m; }).slice(-1)[0];
                 monthlySoldes.push(lastPayment ? Math.round(lastPayment.solde) : 0);
             }
-
             if (myChart) myChart.destroy();
-
             myChart = new Chart(ctx.getContext('2d'), {
                 type: 'line',
                 data: {
@@ -731,22 +551,14 @@
                         data: monthlySoldes,
                         borderColor: '#0284c7',
                         backgroundColor: 'rgba(2, 132, 199, 0.1)',
-                        borderWidth: 3,
-                        fill: true,
-                        tension: 0.3,
-                        pointRadius: 6,
-                        pointBackgroundColor: '#0284c7'
+                        borderWidth: 3, fill: true, tension: 0.3, pointRadius: 6, pointBackgroundColor: '#0284c7'
                     }]
                 },
                 options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
+                    responsive: true, maintainAspectRatio: false,
                     plugins: { legend: { display: false } },
                     scales: {
-                        y: {
-                            grid: { color: '#f1f5f9' },
-                            ticks: { callback: function(v) { return v.toLocaleString('fr-FR') + ' $'; } }
-                        },
+                        y: { grid: { color: '#f1f5f9' }, ticks: { callback: function(v) { return v.toLocaleString('fr-FR') + ' $'; } } },
                         x: { grid: { display: false } }
                     }
                 }
@@ -755,6 +567,7 @@
 
         window.onload = function() {
             generateAllData();
+            renderRealPayments();
         };
     </script>
 </body>
