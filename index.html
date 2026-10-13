@@ -210,7 +210,7 @@
     <!-- TABLEAU ECHEANCIER -->
     <div class="max-w-7xl mx-auto mb-8">
         <div class="card p-6">
-            <h3 class="text-xl font-bold text-slate-800 mb-4">🛠️ Échéancier Théorique (15 000 pcs / mois)</h3>
+            <h3 class="text-xl font-bold text-slate-800 mb-4">🛠️ Échéancier Théorique (15 000 pcs / mois - Production 30 Jours)</h3>
             <div class="overflow-x-auto">
                 <table class="w-full text-left text-sm">
                     <thead>
@@ -257,6 +257,10 @@
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 mb-1">Prix de Vente Gros ($/flacon)</label>
                     <input type="text" id="param-vente" value="0.90" class="w-full p-2 border rounded-lg text-sm bg-slate-50">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Durée Prod Usine (Jours)</label>
+                    <input type="text" id="param-prod" value="30" class="w-full p-2 border rounded-lg text-sm bg-slate-50">
                 </div>
                 <button onclick="generateAllData()" class="w-full py-2.5 bg-accent-blue text-white font-bold rounded-lg hover:bg-blue-800 transition text-sm">
                     Recalculer le modèle
@@ -310,12 +314,11 @@
 
             var coutUsineLot = volMensuel * pxUsine;
             
-            // Calcul du poids proportionnel du fret (86kg pour 10k pcs => ~0.0086 kg par pièce)
             var poidsLotKg = volMensuel * 0.0086;
             var coutFretLot = poidsLotKg * pxFret;
 
-            var coutFret10k = 86 * pxFret;        // 1 634 $
-            var ca10k = 10000 * pxVente;          // 9 000 $
+            var coutFret10k = 86 * pxFret;        
+            var ca10k = 10000 * pxVente;          
             var caMensuel = volMensuel * pxVente; 
 
             allPayments = [];
@@ -340,7 +343,6 @@
             });
             calendarEvents.push({ date: "2026-10-30", label: "💰 Acompte 30% Usine (" + (volMensuel/1000) + "k)", type: "usine" });
 
-            // Mise à jour KPI engagement initial (560 + acompte)
             var kpiEngagementEl = document.getElementById('kpi-engagement');
             if(kpiEngagementEl) {
                 kpiEngagementEl.innerText = (560 + acompteAmt).toFixed(2) + ' $';
@@ -385,16 +387,17 @@
                     });
                 }
 
-                var date20Str = formatDateStr(year, monthIdx, 20);
+                // Production de 30 jours : Le solde usine et le fret interviennent le 30 du mois (au lieu du 20)
+                var dateSoldeStr = formatDateStr(year, monthIdx, 30);
                 
                 tempRows.push({
-                    date: date20Str, displayDate: "20 " + mLabel.split(' ')[0],
+                    date: dateSoldeStr, displayDate: "30 " + mLabel.split(' ')[0],
                     monthCode: mCode, label: "Solde 70% Usine (" + (volMensuel/1000) + "k pcs)", entity: "Usine Chine",
                     type: "OUT", amount: soldeAmt
                 });
 
                 tempRows.push({
-                    date: date20Str, displayDate: "20 " + mLabel.split(' ')[0],
+                    date: dateSoldeStr, displayDate: "30 " + mLabel.split(' ')[0],
                     monthCode: mCode, label: "Fret Aérien " + (volMensuel/1000) + "k pcs (~" + Math.round(poidsLotKg) + "kg)", entity: "Stone Cargo / Transitaire",
                     type: "OUT", amount: coutFretLot
                 });
@@ -420,6 +423,14 @@
                 return (a.type === 'OUT' ? -1 : 1) - (b.type === 'OUT' ? -1 : 1);
             });
 
+            // Recalcul des événements calendrier basés sur le tableau trié
+            tempRows.forEach(function(row) {
+                var typeEvent = 'usine';
+                if(row.label.includes('Fret')) typeEvent = 'fret';
+                if(row.label.includes('Encaissement')) typeEvent = 'vente';
+                calendarEvents.push({ date: row.date, label: (row.type==='OUT' ? '📤 ' : '📥 ') + row.label.split('(')[0], type: typeEvent });
+            });
+
             // Calcul du solde cumulé séquentiel après tri
             currentSolde = 0;
             tempRows.forEach(function(row) {
@@ -434,7 +445,6 @@
                 });
             });
 
-            // MAJ KPIs CA global & Solde
             var totalCACumule = ca10k + (6 * caMensuel);
             var kpiCAEl = document.getElementById('kpi-ca');
             if(kpiCAEl) {
