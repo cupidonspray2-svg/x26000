@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>X26000 - Planning, Alerte Calendrier & Suivi Trésorerie</title>
+    <title>X26000 - Planning, Alerte Calendrier & Suivi Trésorerie Firebase</title>
     
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#0284c7">
@@ -13,6 +13,38 @@
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Firebase App (Modular SDKs) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getDatabase, ref, push, set, onValue, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+        import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyA2E5Ygxv_8hMm4C6HbTtpyprGUzi1xDPY",
+            authDomain: "x26000.firebaseapp.com",
+            databaseURL: "https://x26000-default-rtdb.firebaseio.com",
+            projectId: "x26000",
+            storageBucket: "x26000.firebasestorage.app",
+            messagingSenderId: "789227184987",
+            appId: "1:789227184987:web:3b35f60f3d05b17c44707e",
+            measurementId: "G-GNRMLPDL3V"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        const storage = getStorage(app);
+
+        window.db = db;
+        window.storage = storage;
+        window.FB_Refs = { ref, push, set, onValue, remove, storageRef, uploadBytes, getDownloadURL };
+        
+        // Déclenchement du chargement une fois Firebase prêt
+        if(window.initAppAfterFirebase) {
+            window.initAppAfterFirebase();
+        }
+    </script>
+
     <style>
         body { background-color: #f8fafc; color: #1e293b; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         .card { background: white; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); border: 1px solid #e2e8f0; }
@@ -37,7 +69,7 @@
                 <span class="px-3 py-1 bg-blue-600 text-white font-black rounded-lg text-lg tracking-wider">X26000</span>
                 <h1 class="text-2xl md:text-3xl font-bold text-slate-900">Cupidon Spray — Opérations 26 000 pcs / Mois</h1>
             </div>
-            <p class="text-slate-500 mt-1">Démarrage le 30 Octobre 2026 • Fret calculé sur base réelle (86kg pour 10k pcs à 19$/kg)</p>
+            <p class="text-slate-500 mt-1">Démarrage le 30 Octobre 2026 • Synchronisation Cloud Firebase active</p>
         </div>
         <div class="flex gap-3">
             <span class="px-4 py-2 bg-blue-50 text-blue-700 rounded-lg font-semibold text-sm border border-blue-200">
@@ -46,22 +78,6 @@
             <span class="px-4 py-2 bg-emerald-50 text-emerald-700 rounded-lg font-semibold text-sm border border-emerald-200">
                 💰 CA Mensuel : 23 400 $
             </span>
-        </div>
-    </div>
-
-    <!-- BANNIERE D'ALERTE -->
-    <div class="max-w-7xl mx-auto mb-8">
-        <div id="alert-banner" class="card p-4 border-l-4 border-l-amber-500 bg-amber-50/50 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-            <div class="flex items-start gap-3">
-                <span class="text-2xl">🔔</span>
-                <div>
-                    <h4 class="font-bold text-amber-900 text-sm" id="alert-title">30 Octobre 2026 : Lancement du Modèle X26000</h4>
-                    <p class="text-xs text-amber-800 mt-0.5" id="alert-desc">Fret 10k pcs (86 kg) = 1 634 $ payable au retrait Kinshasa le 5 Novembre.</p>
-                </div>
-            </div>
-            <button onclick="requestNotificationPermission()" class="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-lg text-xs transition shadow-sm whitespace-nowrap">
-                🔔 Activer les notifications push
-            </button>
         </div>
     </div>
 
@@ -129,7 +145,7 @@
     <div class="max-w-7xl mx-auto mb-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div class="card p-6 border-l-4 border-l-blue-600">
             <h3 class="text-lg font-bold text-slate-800 mb-2">➕ Enregistrer une Transaction Réelle</h3>
-            <p class="text-xs text-slate-500 mb-4">Saisis chaque règlement et insère la preuve</p>
+            <p class="text-xs text-slate-500 mb-4">Saisis chaque règlement (Synchronisé sur Firebase)</p>
             
             <form id="form-real-payment" onsubmit="addRealPayment(event)" class="space-y-3">
                 <div>
@@ -167,7 +183,7 @@
                     <label class="block text-xs font-semibold text-slate-600 mb-1">🖼️ Capture / Preuve de transaction</label>
                     <input type="file" id="real-proof" accept="image/*" class="w-full p-1.5 border rounded-lg text-xs bg-slate-50 text-slate-600">
                 </div>
-                <button type="submit" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg transition text-sm">
+                <button type="submit" id="btn-submit" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg transition text-sm">
                     Enregistrer la transaction
                 </button>
             </form>
@@ -177,9 +193,9 @@
             <div class="flex justify-between items-center mb-4">
                 <div>
                     <h3 class="text-lg font-bold text-slate-800">📊 Historique des Paiements Effectués</h3>
-                    <p class="text-xs text-slate-500">Journal des transactions réelles</p>
+                    <p class="text-xs text-slate-500">Journal Cloud en temps réel</p>
                 </div>
-                <span class="px-3 py-1 text-xs font-bold rounded-full bg-emerald-100 text-emerald-800">Système actif</span>
+                <span class="px-3 py-1 text-xs font-bold rounded-full bg-emerald-100 text-emerald-800">Firebase Actif</span>
             </div>
             <div class="overflow-x-auto max-h-96 overflow-y-auto">
                 <table class="w-full text-left text-sm">
@@ -222,6 +238,45 @@
         </div>
     </div>
 
+    <!-- GRAPH & PARAMETRES -->
+    <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+        <div class="card p-6 lg:col-span-2">
+            <h3 class="text-lg font-bold text-slate-800 mb-4">📈 Courbe d'Évolution de la Trésorerie (26 000 pcs / mois)</h3>
+            <div class="h-72">
+                <canvas id="financeChart"></canvas>
+            </div>
+        </div>
+
+        <div class="card p-6">
+            <h3 class="text-lg font-bold text-slate-800 mb-4">⚙ Paramètres X26000</h3>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Prix Usine Chine ($/flacon)</label>
+                    <input type="text" id="param-usine" value="0.096" class="w-full p-2 border rounded-lg text-sm bg-slate-50">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Tarif Fret Aérien ($/kg)</label>
+                    <input type="text" id="param-fret" value="19" class="w-full p-2 border rounded-lg text-sm bg-slate-50">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Prix de Vente Gros ($/flacon)</label>
+                    <input type="text" id="param-vente" value="0.90" class="w-full p-2 border rounded-lg text-sm bg-slate-50">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Durée Prod Usine (Jours)</label>
+                    <input type="text" id="param-prod" value="20" class="w-full p-2 border rounded-lg text-sm bg-slate-50">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Durée Conditionnement (Jours)</label>
+                    <input type="text" id="param-condi" value="5" class="w-full p-2 border rounded-lg text-sm bg-slate-50">
+                </div>
+                <button onclick="generateAllData()" class="w-full py-2.5 bg-accent-blue text-white font-bold rounded-lg hover:bg-blue-800 transition text-sm">
+                    Recalculer le modèle X26000
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- MODALE -->
     <div id="proof-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
         <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl relative border border-slate-100">
@@ -236,15 +291,12 @@
         </div>
     </div>
 
+    <!-- LOGIQUE JAVASCRIPT ET FIREBASE -->
     <script>
         var myChart = null;
         var allPayments = [];
         var calendarEvents = [];
         var realPayments = [];
-
-        try {
-            realPayments = JSON.parse(localStorage.getItem('cupidon_real_payments')) || [];
-        } catch(e) { realPayments = []; }
         
         var currentCalYear = 2026;
         var currentCalMonth = 9;
@@ -268,20 +320,19 @@
             var pxVente = cleanNum(document.getElementById('param-vente').value) || 0.90;
 
             var volMensuel = 26000;
-            var coutUsineLot = volMensuel * pxUsine; // 2 496 $
+            var coutUsineLot = volMensuel * pxUsine;
             
-            // Calcul exact du fret basé sur 86 kg pour 10k pcs et proportionnel pour 26k pcs (~223.6 kg)
-            var coutFret10k = 86 * pxFret;        // 86 kg * 19$ = 1 634 $
-            var coutFret26k = (86 * 2.6) * pxFret; // ~223.6 kg * 19$ = 4 248,40 $
+            var coutFret10k = 86 * pxFret;        // 1 634 $
+            var coutFret26k = (86 * 2.6) * pxFret; // 4 248,40 $
 
-            var caMensuel = volMensuel * pxVente; // 23 400 $
-            var ca10k = 10000 * pxVente;          // 9 000 $
+            var caMensuel = volMensuel * pxVente; 
+            var ca10k = 10000 * pxVente;          
 
             allPayments = [];
             calendarEvents = [];
             var currentSolde = 0;
 
-            // 30 Octobre : Solde usine 10k pcs + Acompte 30% lot 26k
+            // 30 Octobre
             currentSolde -= 560;
             allPayments.push({
                 date: "2026-10-30", displayDate: "30 Oct 2026", monthCode: "M0",
@@ -290,7 +341,7 @@
             });
             calendarEvents.push({ date: "2026-10-30", label: "💰 Solde 560$ Usine (10k)", type: "usine" });
 
-            var acompteAmt = coutUsineLot * 0.3; // 748,80 $
+            var acompteAmt = coutUsineLot * 0.3; 
             currentSolde -= acompteAmt;
             allPayments.push({
                 date: "2026-10-30", displayDate: "30 Oct 2026", monthCode: "M1",
@@ -299,7 +350,7 @@
             });
             calendarEvents.push({ date: "2026-10-30", label: "💰 Acompte 30% Usine (26k)", type: "usine" });
 
-            // 05 Novembre : Retrait & Fret 86kg (1 634 $)
+            // 05 Novembre
             currentSolde -= coutFret10k;
             allPayments.push({
                 date: "2026-11-05", displayDate: "05 Nov 2026", monthCode: "M0",
@@ -308,7 +359,7 @@
             });
             calendarEvents.push({ date: "2026-11-05", label: "✈️ Fret 86kg (1 634$)", type: "fret" });
 
-            // 25 Novembre : Encaissement Ventes Stock Initial (9 000 $)
+            // 25 Novembre
             currentSolde += ca10k;
             allPayments.push({
                 date: "2026-11-25", displayDate: "25 Nov 2026", monthCode: "M1",
@@ -326,7 +377,7 @@
                 var year = years[m];
                 var monthIdx = monthIndexes[m];
 
-                var soldeAmt = coutUsineLot * 0.7; // 1 747,20 $
+                var soldeAmt = coutUsineLot * 0.7; 
 
                 if (m > 0) {
                     var prevMonthIdx = monthIdx === 0 ? 11 : monthIdx - 1;
@@ -343,7 +394,6 @@
 
                 var date20Str = formatDateStr(year, monthIdx, 20);
                 
-                // Solde 70% Usine
                 currentSolde -= soldeAmt;
                 allPayments.push({
                     date: date20Str, displayDate: "20 " + mLabel.split(' ')[0],
@@ -351,7 +401,6 @@
                     type: "OUT", amount: soldeAmt, solde: currentSolde
                 });
 
-                // Fret Aérien 26k pcs (~223.6 kg = 4 248,40 $)
                 currentSolde -= coutFret26k;
                 allPayments.push({
                     date: date20Str, displayDate: "20 " + mLabel.split(' ')[0],
@@ -444,10 +493,23 @@
         }
 
         function requestNotificationPermission() {
-            if ("Notification" in window) {
-                Notification.requestPermission();
-            }
+            if ("Notification" in window) { Notification.requestPermission(); }
         }
+
+        // --- FIREBASE SYNC & STORAGE ---
+        window.initAppAfterFirebase = function() {
+            var dbRef = window.FB_Refs.ref(window.db, 'transactions');
+            window.FB_Refs.onValue(dbRef, function(snapshot) {
+                realPayments = [];
+                const data = snapshot.val();
+                if (data) {
+                    Object.keys(data).forEach(function(key) {
+                        realPayments.push({ id: key, ...data[key] });
+                    });
+                }
+                renderRealPayments();
+            });
+        };
 
         function addRealPayment(e) {
             e.preventDefault();
@@ -457,31 +519,54 @@
             var typeVal = document.getElementById('real-type').value;
             var amtVal = parseFloat(document.getElementById('real-amount').value);
             var fileInput = document.getElementById('real-proof');
+            var submitBtn = document.getElementById('btn-submit');
 
-            function saveAndRender(proofBase64) {
-                var newPayment = {
-                    id: Date.now(), date: dateVal, category: catVal, label: labelVal,
-                    type: typeVal, amount: amtVal, proof: proofBase64 || null
-                };
-                realPayments.push(newPayment);
-                try { localStorage.setItem('cupidon_real_payments', JSON.stringify(realPayments)); } catch(err) {}
-                document.getElementById('form-real-payment').reset();
-                renderRealPayments();
+            submitBtn.innerText = "Envoi en cours...";
+            submitBtn.disabled = true;
+
+            function saveToFirebase(imageUrl) {
+                var newTransRef = window.FB_Refs.push(window.FB_Refs.ref(window.db, 'transactions'));
+                window.FB_Refs.set(newTransRef, {
+                    date: dateVal,
+                    category: catVal,
+                    label: labelVal,
+                    type: typeVal,
+                    amount: amtVal,
+                    proof: imageUrl || null
+                }).then(function() {
+                    document.getElementById('form-real-payment').reset();
+                    submitBtn.innerText = "Enregistrer la transaction";
+                    submitBtn.disabled = false;
+                }).catch(function(err) {
+                    alert("Erreur d'enregistrement : " + err.message);
+                    submitBtn.innerText = "Enregistrer la transaction";
+                    submitBtn.disabled = false;
+                });
             }
 
             if (fileInput.files && fileInput.files[0]) {
-                var reader = new FileReader();
-                reader.onload = function(evt) { saveAndRender(evt.target.result); };
-                reader.readAsDataURL(fileInput.files[0]);
+                var file = fileInput.files[0];
+                var fileId = 'proofs/' + Date.now() + '_' + file.name;
+                var sRef = window.FB_Refs.storageRef(window.storage, fileId);
+
+                window.FB_Refs.uploadBytes(sRef, file).then(function(snapshot) {
+                    return window.FB_Refs.getDownloadURL(snapshot.ref);
+                }).then(function(downloadURL) {
+                    saveToFirebase(downloadURL);
+                }).catch(function(error) {
+                    alert("Erreur d'envoi d'image : " + error.message);
+                    submitBtn.innerText = "Enregistrer la transaction";
+                    submitBtn.disabled = false;
+                });
             } else {
-                saveAndRender(null);
+                saveToFirebase(null);
             }
         }
 
         function deleteRealPayment(id) {
-            realPayments = realPayments.filter(function(p) { return p.id !== id; });
-            try { localStorage.setItem('cupidon_real_payments', JSON.stringify(realPayments)); } catch(e) {}
-            renderRealPayments();
+            if(confirm("Confirmer la suppression de cette transaction ?")) {
+                window.FB_Refs.remove(window.FB_Refs.ref(window.db, 'transactions/' + id));
+            }
         }
 
         function openProofModal(id) {
@@ -512,7 +597,7 @@
                 var tr = document.createElement('tr');
                 tr.className = p.type === 'IN' ? 'bg-emerald-50/40' : 'hover:bg-slate-50';
                 var proofHTML = p.proof 
-                    ? '<img src="' + p.proof + '" onclick="openProofModal(' + p.id + ')" class="w-8 h-8 object-cover rounded border cursor-pointer hover:scale-105 transition mx-auto">'
+                    ? '<img src="' + p.proof + '" onclick="openProofModal(\'' + p.id + '\')" class="w-8 h-8 object-cover rounded border cursor-pointer hover:scale-105 transition mx-auto">'
                     : '<span class="text-[10px] text-slate-300 italic">Aucune</span>';
                 tr.innerHTML = 
                     '<td class="p-2 text-xs font-semibold text-slate-600">' + p.date + '</td>' +
@@ -523,8 +608,8 @@
                     '</td>' +
                     '<td class="p-2 text-xs text-center">' + proofHTML + '</td>' +
                     '<td class="p-2 text-xs text-center flex items-center justify-center gap-2">' +
-                        '<button onclick="openProofModal(' + p.id + ')" class="text-blue-600 hover:text-blue-800 font-bold">👁️</button>' +
-                        '<button onclick="deleteRealPayment(' + p.id + ')" class="text-rose-500 hover:text-rose-700 font-bold">✕</button>' +
+                        '<button onclick="openProofModal(\'' + p.id + '\')" class="text-blue-600 hover:text-blue-800 font-bold">👁️</button>' +
+                        '<button onclick="deleteRealPayment(\'' + p.id + '\')" class="text-rose-500 hover:text-rose-700 font-bold">✕</button>' +
                     '</td>';
                 tbody.appendChild(tr);
             });
@@ -567,7 +652,6 @@
 
         window.onload = function() {
             generateAllData();
-            renderRealPayments();
         };
     </script>
 </body>
