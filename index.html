@@ -14,11 +14,10 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-    <!-- Firebase App (Modular SDKs) -->
+    <!-- Firebase Realtime Database SDK (Sans Storage) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getDatabase, ref, push, set, onValue, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
-        import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyA2E5Ygxv_8hMm4C6HbTtpyprGUzi1xDPY",
@@ -33,13 +32,10 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
-        const storage = getStorage(app);
 
         window.db = db;
-        window.storage = storage;
-        window.FB_Refs = { ref, push, set, onValue, remove, storageRef, uploadBytes, getDownloadURL };
+        window.FB_Refs = { ref, push, set, onValue, remove };
         
-        // Déclenchement du chargement une fois Firebase prêt
         if(window.initAppAfterFirebase) {
             window.initAppAfterFirebase();
         }
@@ -496,7 +492,7 @@
             if ("Notification" in window) { Notification.requestPermission(); }
         }
 
-        // --- FIREBASE SYNC & STORAGE ---
+        // --- FIREBASE SYNC (Direct Base64 DB Storage) ---
         window.initAppAfterFirebase = function() {
             var dbRef = window.FB_Refs.ref(window.db, 'transactions');
             window.FB_Refs.onValue(dbRef, function(snapshot) {
@@ -521,10 +517,10 @@
             var fileInput = document.getElementById('real-proof');
             var submitBtn = document.getElementById('btn-submit');
 
-            submitBtn.innerText = "Envoi en cours...";
+            submitBtn.innerText = "Enregistrement...";
             submitBtn.disabled = true;
 
-            function saveToFirebase(imageUrl) {
+            function saveToFirebase(imageBase64) {
                 var newTransRef = window.FB_Refs.push(window.FB_Refs.ref(window.db, 'transactions'));
                 window.FB_Refs.set(newTransRef, {
                     date: dateVal,
@@ -532,7 +528,7 @@
                     label: labelVal,
                     type: typeVal,
                     amount: amtVal,
-                    proof: imageUrl || null
+                    proof: imageBase64 || null
                 }).then(function() {
                     document.getElementById('form-real-payment').reset();
                     submitBtn.innerText = "Enregistrer la transaction";
@@ -545,19 +541,11 @@
             }
 
             if (fileInput.files && fileInput.files[0]) {
-                var file = fileInput.files[0];
-                var fileId = 'proofs/' + Date.now() + '_' + file.name;
-                var sRef = window.FB_Refs.storageRef(window.storage, fileId);
-
-                window.FB_Refs.uploadBytes(sRef, file).then(function(snapshot) {
-                    return window.FB_Refs.getDownloadURL(snapshot.ref);
-                }).then(function(downloadURL) {
-                    saveToFirebase(downloadURL);
-                }).catch(function(error) {
-                    alert("Erreur d'envoi d'image : " + error.message);
-                    submitBtn.innerText = "Enregistrer la transaction";
-                    submitBtn.disabled = false;
-                });
+                var reader = new FileReader();
+                reader.onload = function(evt) {
+                    saveToFirebase(evt.target.result);
+                };
+                reader.readAsDataURL(fileInput.files[0]);
             } else {
                 saveToFirebase(null);
             }
