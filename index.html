@@ -63,13 +63,13 @@
         <div>
             <div class="flex items-center gap-2">
                 <span class="px-3 py-1 bg-blue-600 text-white font-black rounded-lg text-lg tracking-wider">X26000 ELOGE</span>
-                <h1 class="text-2xl md:text-3xl font-bold text-slate-900">Cupidon Spray — Opérations & Stock Pilote</h1>
+                <h1 class="text-2xl md:text-3xl font-bold text-slate-900">Cupidon Spray — Opérations 15 000 pcs / Mois</h1>
             </div>
             <p class="text-slate-500 mt-1">Démarrage le 30 Octobre 2026 • Synchronisation Cloud Firebase</p>
         </div>
         <div class="flex gap-3">
             <span class="px-4 py-2 bg-blue-50 text-blue-700 rounded-lg font-semibold text-sm border border-blue-200">
-                🚀 Objectif : Stock 10k + 26 000 pcs / mois
+                🚀 Objectif : Stock 10k + 15 000 pcs / mois
             </span>
         </div>
     </div>
@@ -78,18 +78,18 @@
     <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
         <div class="card p-5">
             <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Engagement Initial Usine (30 Oct)</p>
-            <h2 class="text-2xl font-black text-rose-600 mt-1">1 308,80 $</h2>
-            <p class="text-xs text-slate-500 mt-1">560$ (Solde stock) + 748,80$ (Acompte 30%)</p>
+            <h2 class="text-2xl font-black text-rose-600 mt-1" id="kpi-engagement">-</h2>
+            <p class="text-xs text-slate-500 mt-1">560$ (Solde stock) + Acompte 30%</p>
         </div>
         <div class="card p-5">
             <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Volume Total (6 Mois)</p>
-            <h2 class="text-2xl font-black text-slate-800 mt-1">166 000 pcs</h2>
-            <p class="text-xs text-slate-500 mt-1">10k stock + 6 × 26k pcs/mois</p>
+            <h2 class="text-2xl font-black text-slate-800 mt-1">100 000 pcs</h2>
+            <p class="text-xs text-slate-500 mt-1">10k stock + 6 × 15k pcs/mois</p>
         </div>
         <div class="card p-5">
             <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Chiffre d'Affaires Cumulé</p>
-            <h2 class="text-2xl font-black text-blue-600 mt-1">149 400 $</h2>
-            <p class="text-xs text-slate-500 mt-1">9 000$ (Stock 10k) + 6 × 23 400$ (Vagues 26k)</p>
+            <h2 class="text-2xl font-black text-blue-600 mt-1" id="kpi-ca">-</h2>
+            <p class="text-xs text-slate-500 mt-1">9 000$ (Stock 10k) + 6 × CA Mensuel</p>
         </div>
         <div class="card p-5">
             <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Trésorerie Nette Finale (M6)</p>
@@ -156,7 +156,7 @@
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 mb-1">Description / Motif</label>
-                    <input type="text" id="real-label" placeholder="ex: Paiement fret 86kg (1634$)" required class="w-full p-2 border rounded-lg text-sm bg-slate-50">
+                    <input type="text" id="real-label" placeholder="ex: Paiement fret (1000$)" required class="w-full p-2 border rounded-lg text-sm bg-slate-50">
                 </div>
                 <div class="grid grid-cols-2 gap-2">
                     <div>
@@ -168,7 +168,7 @@
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 mb-1">Montant ($)</label>
-                        <input type="number" step="0.01" id="real-amount" placeholder="1634" required class="w-full p-2 border rounded-lg text-sm bg-slate-50">
+                        <input type="number" step="0.01" id="real-amount" placeholder="1000" required class="w-full p-2 border rounded-lg text-sm bg-slate-50">
                     </div>
                 </div>
                 <div>
@@ -210,7 +210,7 @@
     <!-- TABLEAU ECHEANCIER -->
     <div class="max-w-7xl mx-auto mb-8">
         <div class="card p-6">
-            <h3 class="text-xl font-bold text-slate-800 mb-4">🛠️ Échéancier Théorique (Tri Chronologique Strict)</h3>
+            <h3 class="text-xl font-bold text-slate-800 mb-4">🛠️ Échéancier Théorique (15 000 pcs / mois)</h3>
             <div class="overflow-x-auto">
                 <table class="w-full text-left text-sm">
                     <thead>
@@ -242,6 +242,10 @@
         <div class="card p-6">
             <h3 class="text-lg font-bold text-slate-800 mb-4">⚙ Paramètres X26000 Eloge</h3>
             <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Volume Mensuel (pcs)</label>
+                    <input type="text" id="param-volume" value="15000" class="w-full p-2 border rounded-lg text-sm bg-slate-50">
+                </div>
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 mb-1">Prix Usine Chine ($/flacon)</label>
                     <input type="text" id="param-usine" value="0.096" class="w-full p-2 border rounded-lg text-sm bg-slate-50">
@@ -299,24 +303,24 @@
         }
 
         function generateAllData() {
+            var volMensuel = cleanNum(document.getElementById('param-volume').value) || 15000;
             var pxUsine = cleanNum(document.getElementById('param-usine').value) || 0.096;
             var pxFret = cleanNum(document.getElementById('param-fret').value) || 19;
             var pxVente = cleanNum(document.getElementById('param-vente').value) || 0.90;
 
-            var volMensuel = 26000;
             var coutUsineLot = volMensuel * pxUsine;
             
-            var coutFret10k = 86 * pxFret;        // 1 634 $
-            var coutFret26k = (86 * 2.6) * pxFret; // 4 248,40 $
+            // Calcul du poids proportionnel du fret (86kg pour 10k pcs => ~0.0086 kg par pièce)
+            var poidsLotKg = volMensuel * 0.0086;
+            var coutFretLot = poidsLotKg * pxFret;
 
+            var coutFret10k = 86 * pxFret;        // 1 634 $
+            var ca10k = 10000 * pxVente;          // 9 000 $
             var caMensuel = volMensuel * pxVente; 
-            var ca10k = 10000 * pxVente;          
 
             allPayments = [];
             calendarEvents = [];
             var currentSolde = 0;
-
-            // Tableau temporaire brut pour stocker avant de trier chronologiquement
             var tempRows = [];
 
             // 30 Octobre - Solde stock 10k
@@ -327,14 +331,20 @@
             });
             calendarEvents.push({ date: "2026-10-30", label: "💰 Solde 560$ Usine (10k)", type: "usine" });
 
-            // 30 Octobre - Acompte 30% M1
+            // 30 Octobre - Acompte 30% M1 (15k pcs)
             var acompteAmt = coutUsineLot * 0.3; 
             tempRows.push({
                 date: "2026-10-30", displayDate: "30 Oct 2026", monthCode: "M1",
-                label: "Acompte 30% Usine (26 000 pcs Nov)", entity: "Usine Chine",
+                label: "Acompte 30% Usine (" + volMensuel.toLocaleString('fr-FR') + " pcs Nov)", entity: "Usine Chine",
                 type: "OUT", amount: acompteAmt
             });
-            calendarEvents.push({ date: "2026-10-30", label: "💰 Acompte 30% Usine (26k)", type: "usine" });
+            calendarEvents.push({ date: "2026-10-30", label: "💰 Acompte 30% Usine (" + (volMensuel/1000) + "k)", type: "usine" });
+
+            // Mise à jour KPI engagement initial (560 + acompte)
+            var kpiEngagementEl = document.getElementById('kpi-engagement');
+            if(kpiEngagementEl) {
+                kpiEngagementEl.innerText = (560 + acompteAmt).toFixed(2) + ' $';
+            }
 
             // 05 Novembre - Fret 10k
             tempRows.push({
@@ -370,7 +380,7 @@
 
                     tempRows.push({
                         date: prevDateStr, displayDate: "30 " + monthNames[m-1].split(' ')[0],
-                        monthCode: mCode, label: "Acompte 30% Usine (26k pcs " + mLabel + ")", entity: "Usine Chine",
+                        monthCode: mCode, label: "Acompte 30% Usine (" + (volMensuel/1000) + "k pcs " + mLabel + ")", entity: "Usine Chine",
                         type: "OUT", amount: acompteAmt
                     });
                 }
@@ -379,14 +389,14 @@
                 
                 tempRows.push({
                     date: date20Str, displayDate: "20 " + mLabel.split(' ')[0],
-                    monthCode: mCode, label: "Solde 70% Usine (26k pcs)", entity: "Usine Chine",
+                    monthCode: mCode, label: "Solde 70% Usine (" + (volMensuel/1000) + "k pcs)", entity: "Usine Chine",
                     type: "OUT", amount: soldeAmt
                 });
 
                 tempRows.push({
                     date: date20Str, displayDate: "20 " + mLabel.split(' ')[0],
-                    monthCode: mCode, label: "Fret Aérien 26k pcs (~223.6kg)", entity: "Stone Cargo / Transitaire",
-                    type: "OUT", amount: coutFret26k
+                    monthCode: mCode, label: "Fret Aérien " + (volMensuel/1000) + "k pcs (~" + Math.round(poidsLotKg) + "kg)", entity: "Stone Cargo / Transitaire",
+                    type: "OUT", amount: coutFretLot
                 });
 
                 var nextMonthIdx = monthIdx === 11 ? 0 : monthIdx + 1;
@@ -395,7 +405,7 @@
 
                 tempRows.push({
                     date: date10NextStr, displayDate: "10 " + (m<5 ? monthNames[m+1].split(' ')[0] : 'Mai'),
-                    monthCode: mCode, label: "Encaissement Ventes Vague 26k flacons", entity: "Réseau Ventes Kin/Brazza",
+                    monthCode: mCode, label: "Encaissement Ventes Vague " + (volMensuel/1000) + "k flacons", entity: "Réseau Ventes Kin/Brazza",
                     type: "IN", amount: caMensuel
                 });
             }
@@ -407,7 +417,6 @@
                 if (dateA - dateB !== 0) {
                     return dateA - dateB;
                 }
-                // Si même date, les sorties (OUT) avant les entrées (IN)
                 return (a.type === 'OUT' ? -1 : 1) - (b.type === 'OUT' ? -1 : 1);
             });
 
@@ -424,6 +433,13 @@
                     solde: currentSolde
                 });
             });
+
+            // MAJ KPIs CA global & Solde
+            var totalCACumule = ca10k + (6 * caMensuel);
+            var kpiCAEl = document.getElementById('kpi-ca');
+            if(kpiCAEl) {
+                kpiCAEl.innerText = totalCACumule.toLocaleString('fr-FR') + ' $';
+            }
 
             var kpiMargeEl = document.getElementById('kpi-marge');
             if(kpiMargeEl) {
